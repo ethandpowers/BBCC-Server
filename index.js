@@ -153,7 +153,6 @@ wss.on('connection', function connection(ws) {
 
 //leaves a room
 function leave(client) {
-    console.log(`${client.id} attempting to leave ${client.room.code}`);
     const code = client.room.code;
     //verify room exists
     if (Object.keys(rooms).includes(code)) {
@@ -167,7 +166,7 @@ function leave(client) {
             client.room.players.splice(indexesToRemove[i], 1);
         }
         client.room = null;
-        console.log(`room ${code} players: ${client.room.players.length}`);
+        console.log(`room ${code} players: ${rooms[code].players.length}`);
     }
 }
 
