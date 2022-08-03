@@ -156,7 +156,16 @@ function leave(client) {
     const code = client.room.code;
     //verify room exists
     if (code && !Object.keys(rooms).includes(code)) {
-        rooms[code].players = rooms[code].players.filter(player => player.id !== client.id);
+        let indexToRemove = -1;
+        for (let i = 0; i < rooms[code].players.length; i++) {
+            if (rooms[code].players[i].id === client.id) {
+                indexToRemove = i;
+                break;
+            }
+        }
+        if (indexToRemove !== -1) {
+            rooms[code].players.splice(indexToRemove, 1);
+        }
         client.room = null;
     }
 }
