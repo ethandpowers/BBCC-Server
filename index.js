@@ -26,6 +26,7 @@ const wss = new WebSocketServer({ port: 3000 });
 
 const maxPlayers = 8;
 let rooms = {};
+let clients = [];
 
 //close empty rooms, and remove disconnected players
 setInterval(() => {
@@ -38,15 +39,25 @@ setInterval(() => {
     } catch (e) { console.error(e) }
 
     //remove disconnected players
-    wss.clients.forEach(function each(ws) {
-        if (ws.isAlive === false){
-            return ws.terminate();
-        };
+    let clientsToRemove = [];
+    for (let i = 0; i < clients.length; i++) {
+        if (clients[i].socket.isAlive) {
+            clients[i].socket.isAlive = false;
+            clients[i].socket.ping();
+        } else {
+            clientsToRemove.push(i);
+        }
+    }
 
-        ws.isAlive = false;
-        ws.ping();
-    });
-}, 1000);
+    for (let i = clientsToRemove.length - 1; i >= 0; i--) {
+        let client = clients.splice(clientsToRemove[i], 1)[0];
+        //leave room
+        if (client.room) {
+            leave(client);
+        }
+        console.log(`client ${client.id} disconnected`);
+    }
+}, 2000);
 
 //closes a room
 function close(code) {
@@ -57,6 +68,7 @@ wss.on('connection', function connection(ws) {
 
     //create a client profile for the duration of the connection
     const client = new Client(ws);
+    clients.push(client);
     console.log(`client ${client.id} connected`);
 
     client.socket.isAlive = true;
@@ -86,7 +98,7 @@ wss.on('connection', function connection(ws) {
                 break;
             case "leave":
                 try {
-                    leave();
+                    leave(client);
                 } catch (e) { "error in leave()", console.log(e); }
                 break;
             case "dispatch":
@@ -130,16 +142,6 @@ wss.on('connection', function connection(ws) {
         console.log(`${client.id} joined ${client.room.code}`);
     }
 
-    //leaves a room
-    function leave() {
-        const code = client.room.code;
-        //verify room exists
-        if (code && !Object.keys(rooms).includes(code)) {
-            rooms[code].players = rooms[code].players.filter(player => player.id !== client.id);
-            client.room = null;
-        }
-    }
-
     //dispatches a message to the room host
     function dispatch(params) {
         if (client.room) {
@@ -148,6 +150,16 @@ wss.on('connection', function connection(ws) {
         }
     }
 });
+
+//leaves a room
+function leave(client) {
+    const code = client.room.code;
+    //verify room exists
+    if (code && !Object.keys(rooms).includes(code)) {
+        rooms[code].players = rooms[code].players.filter(player => player.id !== client.id);
+        client.room = null;
+    }
+}
 
 
 class Client {
