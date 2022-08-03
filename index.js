@@ -156,7 +156,7 @@ function leave(client) {
     console.log(`${client.id} attempting to leave ${client.room.code}`);
     const code = client.room.code;
     //verify room exists
-    if (code && !Object.keys(rooms).includes(code)) {
+    if (!Object.keys(rooms).includes(code)) {
         let indexesToRemove = [];
         for (let i = 0; i < client.room.players.length; i++) {
             if (client.room.players[i].id === client.id) {
@@ -168,6 +168,8 @@ function leave(client) {
         }
         client.room = null;
         console.log(`room ${code} players: ${client.room.players.length}`);
+    }else{
+        console.warn(`room ${code} does not exist`);
     }
 }
 
