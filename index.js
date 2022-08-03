@@ -13,6 +13,7 @@ import { genKey } from "./utils.js";
     }
 
     { "type": "leave", "params": {}}
+    {"type: "dispatch", "params": { --some data-- }"}
 
 
     -----room type-----
@@ -105,6 +106,7 @@ wss.on('connection', function connection(ws) {
                 try {
                     dispatch(params);
                 } catch (e) { "error in dispatch()", console.log(e); }
+                break;
             default:
                 console.warn(`Type: ${type} unknown`);
                 break;
@@ -143,10 +145,9 @@ wss.on('connection', function connection(ws) {
     }
 
     //dispatches a message to the room host
-    function dispatch(params) {
+    function dispatch(message) {
         if (client.room) {
-            console.log(`dispatching ${params} to ${client.room.host.id}`);
-            client.room.host.socket.send(JSON.stringify({ params }));
+            client.room.host.socket.send(JSON.stringify(message));
         }
     }
 });
