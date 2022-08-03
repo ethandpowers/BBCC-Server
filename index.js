@@ -76,6 +76,10 @@ wss.on('connection', function connection(ws) {
                     leave();
                 } catch (e) { "error in leave()", console.log(e); }
                 break;
+            case "dispatch":
+                try {
+                    dispatch(params);
+                } catch (e) { "error in dispatch()", console.log(e); }
             default:
                 console.warn(`Type: ${type} unknown`);
                 break;
@@ -102,6 +106,14 @@ wss.on('connection', function connection(ws) {
         }
         rooms[code].players.push(client);
         client.room = rooms[code];
+        client.socket.send(JSON.stringify(
+            {
+                "message": "joined",
+                "params": {
+                    "group": code,
+                }
+            }
+        ));
         console.log(`${client.id} joined ${client.room.code}`);
     }
 
@@ -114,19 +126,27 @@ wss.on('connection', function connection(ws) {
             client.room = null;
         }
     }
+
+    //dispatches a message to the room host
+    function dispatch(params) {
+        if (client.room) {
+            console.log(`dispatching ${params} to ${client.room.host.id}`);
+            client.room.host.socket.send(JSON.stringify({ params }));
+        }
+    }
 });
 
 
-class Client{
-    constructor(socket){
+class Client {
+    constructor(socket) {
         this.socket = socket;
         this.id = genKey(8);
         this.room = null;
     }
 }
 
-class Room{
-    constructor(host){
+class Room {
+    constructor(host) {
         this.code = genKey(5);
         this.host = host;
         this.players = [];
