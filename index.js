@@ -27,7 +27,7 @@ const wss = new WebSocketServer({ port: 3000 });
 const maxPlayers = 8;
 let rooms = {};
 
-//heartbeat to close empty rooms
+//close empty rooms, and remove disconnected players
 setInterval(() => {
     try {
         Object.values(rooms).forEach(room => {
@@ -36,7 +36,17 @@ setInterval(() => {
             }
         });
     } catch (e) { console.error(e) }
-}, 5000);
+
+    //remove disconnected players
+    wss.clients.forEach(function each(ws) {
+        if (ws.isAlive === false){
+            return ws.terminate();
+        };
+
+        ws.isAlive = false;
+        ws.ping();
+    });
+}, 1000);
 
 //closes a room
 function close(code) {
@@ -48,6 +58,9 @@ wss.on('connection', function connection(ws) {
     //create a client profile for the duration of the connection
     const client = new Client(ws);
     console.log(`client ${client.id} connected`);
+
+    client.socket.isAlive = true;
+    ws.on('pong', () => client.socket.isAlive = true);
 
     //when a message is received from client (controller or host)
     client.socket.on('message', function message(data) {
