@@ -141,13 +141,30 @@ wss.on('connection', function connection(ws) {
                 }
             }
         ));
+
+        client.room.host.socket.send(JSON.stringify(
+            {
+                "type": "joined",
+                "params": {
+                    "id": client.id,
+                }
+            }
+        ));
         console.log(`${client.id} joined ${client.room.code}`);
     }
 
     //dispatches a message to the room host
     function dispatch(message) {
         if (client.room) {
-            client.room.host.socket.send(JSON.stringify(message));
+            client.room.host.socket.send(JSON.stringify(
+                {
+                    "type": "dispatch",
+                    "params": {
+                        "id": client.id,
+                        "message": message,
+                    }
+                }
+            ));
         }
     }
 });
