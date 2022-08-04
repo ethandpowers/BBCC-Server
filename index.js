@@ -134,6 +134,7 @@ wss.on('connection', function connection(ws) {
         }
         rooms[code].players.push(client);
         client.room = rooms[code];
+        //alert client
         client.socket.send(JSON.stringify(
             {
                 "message": "joined",
@@ -142,7 +143,8 @@ wss.on('connection', function connection(ws) {
                 }
             }
         ));
-
+        
+        //alert host
         client.room.host.socket.send(JSON.stringify(
             {
                 "type": "joined",
@@ -184,6 +186,16 @@ function leave(client) {
         for (let i = indexesToRemove.length - 1; i >= 0; i--) {
             client.room.players.splice(indexesToRemove[i], 1);
         }
+
+        //alert host that client left the room
+        client.room.host.socket.send(JSON.stringify(
+            {
+                "type": "left",
+                "params": {
+                    "id": client.id,
+                }
+            }
+        ));
         client.room = null;
         console.log(`room ${code} players: ${rooms[code].players.length}`);
     }
