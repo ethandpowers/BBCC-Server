@@ -118,6 +118,7 @@ wss.on('connection', function connection(ws) {
         const room = new Room(client);
         rooms[room.code] = room;
         client.room = room;
+        client.socket.send(JSON.stringify({ type: "created", params: { room: room.code } }));
         console.log('created room: ', room.code);
     }
 
@@ -155,7 +156,6 @@ wss.on('connection', function connection(ws) {
 
     //dispatches a message to the room host
     function dispatch(message) {
-        console.log("dispatching message:", message);
         if (client.room) {
             client.room.host.socket.send(JSON.stringify(
                 {
