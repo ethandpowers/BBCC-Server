@@ -1,5 +1,8 @@
-import { WebSocketServer, WebSocket } from "ws";
-import { genKey } from "./utils.js";
+// import { WebSocketServer, WebSocket } from "ws";
+// import { genKey } from "./utils.js";
+const genKey = require("./utils.js").genKey;
+const WebSocketServer = require("ws").WebSocketServer;
+const WebSocket = require("ws").WebSocket;
 
 /* 
     -----message types-----
