@@ -155,6 +155,7 @@ wss.on('connection', function connection(ws) {
 
     //dispatches a message to the room host
     function dispatch(message) {
+        console.log("dispatching message:", message);
         if (client.room) {
             client.room.host.socket.send(JSON.stringify(
                 {
