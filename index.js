@@ -35,6 +35,7 @@ setInterval(() => {
     try {
         Object.values(rooms).forEach(room => {
             if (room.host.socket.readyState !== WebSocket.OPEN) {
+                console.log(`closing room ${room.code}: host disconnected`);
                 close(room.code);
             }
         });
