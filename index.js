@@ -24,7 +24,7 @@ const WebSocket = require("ws").WebSocket;
         "players": []
     }
 */
-const wss = new WebSocketServer({ port: 3000 });
+const wss = new WebSocketServer({ port: 443 });
 
 const maxPlayers = 8;
 let rooms = {};
