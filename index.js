@@ -60,7 +60,7 @@ setInterval(() => {
         }
         console.log(`client ${client.id} disconnected`);
     }
-}, 2000);
+}, 5000);
 
 //closes a room
 function close(code) {
