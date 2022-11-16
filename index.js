@@ -60,7 +60,7 @@ setInterval(() => {
         }
         console.log(`client ${client.id} disconnected`);
     }
-}, 5000);
+}, 10000);
 
 //closes a room
 function close(code) {
@@ -145,7 +145,7 @@ wss.on('connection', function connection(ws) {
                 }
             }
         ));
-        
+
         //alert host
         client.room.host.socket.send(JSON.stringify(
             {
